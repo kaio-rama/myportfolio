@@ -1,0 +1,263 @@
+---
+title: 'Patrones de diseño CREACIONALES en el desarrollo de Software'
+publishedAt: '2024-06-18'
+summary: 'Los patrones de diseño que más se repiten en el desarrollo de Software.'
+---
+
+
+### Patrones de diseño en el desarrollo de Software.
+
+Los patrones de diseño son soluciones reutilizables a problemas comunes que surgen durante el proceso de desarrollo de software.
+Actúan como guías probadas para resolver situaciones específicas que enfrentamos con frecuencia, como la gestión de la creación de objetos,
+ la estructura de clases o la interacción entre componentes.
+Es vital conocer, e implementar, algunos de ellos para mejorar la calidad, mantenibilidad y eficiencia del código, ya que 
+nos permiten un enfoque estructurado en lugar de reinventar soluciones desde cero.
+
+### ¿Patrones creacionales?
+
+En este blog nos enfocaremos en los patrones creacionales. ¿Pero que son?
+Se enfocan en la creación de objetos. Simplifican y optimizan la forma en que se crean los objetos,
+proporcionando flexibilidad en la instancia de objetos y evitando la creación directa mediante el operador <b> new</b>.
+
+Los patrones creacionales son útiles cuando el proceso de creación de objetos es complicado, necesita ser 
+controlado o requiere variaciones. Un buen ejemplo es cuando necesitas construir objetos con muchas dependencias, 
+o cuando el código que usa esos objetos no debería estar al tanto de cómo se crean.
+
+Algunos de los patrones más importantes, especialmente relevantes para el desarrollo web y de aplicaciones en JavaScript, TypeScript y React, incluyen:
+
+
+
+### 1. Patrón Singleton
+
+   - Descripción: Este patrón garantiza que una clase tenga solo una instancia y proporciona un punto de acceso global a esa instancia.
+   - Aplicación: Útil para manejar configuraciones globales, como el manejo del estado global de la aplicación o la conexión a una API.
+
+   - Ejemplo: En una aplicación React, puedes utilizar un singleton para almacenar configuraciones de la API o manejar un único cliente de base de datos.
+
+<br/>
+ ``` JavaScript
+
+class Database is
+    // El campo para almacenar la instancia singleton debe
+    // declararse estático.
+    private static field instance: Database
+
+    // El constructor del singleton siempre debe ser privado para
+    // evitar llamadas de construcción directas con el operador 'new'
+    private constructor Database() is
+
+    public static method getInstance() is
+        if (Database.instance == null) then
+            acquireThreadLock() and then
+                // Garantiza que la instancia aún no se ha
+                // inicializado por otro hilo mientras ésta ha
+                // estado esperando el desbloqueo.
+                if (Database.instance == null) then
+                    Database.instance = new Database()
+        return Database.instance
+
+    // Por último, cualquier singleton debe definir cierta
+    // lógica de negocio que pueda ejecutarse en su instancia.
+    public method query(sql) is
+        // Por ejemplo, todas las consultas a la base de datos
+        // de una aplicación pasan por este método. Por lo
+        // tanto, aquí puedes colocar lógica de regularización
+        // (throttling) o de envío a la memoria caché.
+
+class Application is
+    method main() is
+        Database foo = Database.getInstance()
+        foo.query("SELECT ...")
+        
+        Database bar = Database.getInstance()
+        bar.query("SELECT ...")
+````
+
+### 2. Patrón Factory
+
+    - Descripción: Proporciona una interfaz para crear objetos en una clase, pero permite a las subclases alterar el tipo de objetos que se crearán.
+
+    - Aplicación: Ideal cuando una aplicación necesita crear varios tipos de objetos o componentes. En React, se puede utilizar para generar diferentes tipos de componentes dinámicamente.
+    - Ejemplo: Una función que devuelve diferentes componentes de formularios basándose en el tipo de datos (inputs, selects, etc.).
+
+<br/>
+
+``` JavaScript
+
+// La clase creadora declara el método fábrica que debe devolver
+// un objeto de una clase de producto. Normalmente, las subclases
+// de la creadora proporcionan la implementación de este método.
+class Dialog is
+// La creadora también puede proporcionar cierta
+// implementación por defecto del método fábrica.
+    abstract method createButton():Button
+
+// La principal responsabilidad de la "creadora" no es crear productos.
+// Normalmente contiene cierta lógica de negocio que depende de los
+// objetos de producto devueltos por el método fábrica. Las subclases
+// pueden cambiar indirectamente esa lógica de negocio sobrescribiendo
+// el método fábrica y devolviendo desde él un tipo diferente de producto.
+    method render() is
+        // Invoca el método fábrica para crear un objeto de producto.
+        Button okButton = createButton()
+        // Ahora utiliza el producto.
+        okButton.onClick(closeDialog)
+        okButton.render()
+
+// Los creadores concretos sobrescriben el método fábrica para
+// cambiar el tipo de producto resultante.
+class WindowsDialog extends Dialog is
+    method createButton():Button is
+        return new WindowsButton()
+
+class WebDialog extends Dialog is
+    method createButton():Button is
+        return new HTMLButton()
+
+// La interfaz de producto declara las operaciones que todos los
+// productos concretos deben implementar.
+interface Button is
+    method render()
+    method onClick(f)
+
+// Los productos concretos proporcionan varias implementaciones
+// de la interfaz de producto.
+class WindowsButton implements Button is
+    method render(a, b) is
+        // Representa un botón en estilo Windows.
+    method onClick(f) is
+        // Vincula un evento clic de OS nativo.
+
+class HTMLButton implements Button is
+    method render(a, b) is
+        // Devuelve una representación HTML de un botón.
+    method onClick(f) is
+        // Vincula un evento clic de navegador web.
+
+class Application is
+    field dialog: Dialog
+    // La aplicación elige un tipo de creador dependiendo de la
+    // configuración actual o los ajustes del entorno.
+    method initialize() is
+        config = readApplicationConfigFile()
+
+        if (config.OS == "Windows") then
+            dialog = new WindowsDialog()
+        else if (config.OS == "Web") then
+            dialog = new WebDialog()
+        else
+            throw new Exception("Error! Unknown operating system.")
+
+    method main() is
+        this.initialize()
+        dialog.render()
+    
+```
+
+### 3. Abstract Factory
+
+El Patrón Abstract Factory es un patrón de diseño creacional que proporciona una interfaz para crear familias de objetos relacionados
+ o dependientes sin especificar sus clases concretas. Es una extensión del patrón Factory, pero más enfocado en 
+la creación de conjuntos de objetos que deben trabajar juntos, lo que garantiza que los productos creados sean compatibles entre sí.
+
+Lo primero que sugiere el patrón Abstract Factory es que declaremos de forma explícita interfaces para cada producto diferente de la familia de productos.
+Después podemos hacer que todas las variantes de los productos sigan esas interfaces.
+
+El siguiente paso consiste en declarar la Fábrica abstracta: una interfaz con una lista de métodos de creación para todos los productos que son parte de la familia de productos.
+Estos métodos deben devolver productos abstractos representados por las interfaces que extrajimos previamente.
+<br/>
+
+```` JavaScript
+// Declara un grupo de métodos que devuelven distintos productos
+// abstractos. Estos productos se denominan familia y están
+// relacionados por un tema o concepto de alto nivel. Normalmente, los 
+// productos de una familia pueden colaborar entre sí. Una familia de  
+// productos puede tener muchas variantes, pero los productos de una 
+// variante son incompatibles con los productos de otra.
+interface GUIFactory is
+    method createButton():Button
+    method createCheckbox():Checkbox
+
+// Las fábricas concretas producen una familia de productos que
+// pertenecen a una única variante. La fábrica garantiza que los
+// productos resultantes sean compatibles. Las firmas de los métodos 
+// de las fábricas concretas devuelven un producto abstracto mientras 
+// que dentro del método se instancia un producto concreto.
+class WinFactory implements GUIFactory is
+    method createButton():Button is
+        return new WinButton()
+    method createCheckbox():Checkbox is
+        return new WinCheckbox()
+
+// Cada fábrica concreta tiene una variante de producto correspondiente.
+class MacFactory implements GUIFactory is
+    method createButton():Button is
+        return new MacButton()
+    method createCheckbox():Checkbox is
+        return new MacCheckbox()
+
+
+// Cada producto individual de una familia de productos debe tener 
+// una interfaz base. Todas las variantes del producto deben implementar
+// esta interfaz.
+interface Button is
+    method paint()
+
+// Los productos concretos son creados por las fábricas concretas 
+// correspondientes.
+class WinButton implements Button is
+    method paint() is
+        // Representa un botón en estilo Windows.
+
+class MacButton implements Button is
+    method paint() is
+        // Representa un botón en estilo macOS.
+
+// Aquí está la interfaz base de otro producto. Todos los productos 
+// pueden interactuar entre sí, pero sólo entre productos de la misma
+// variante concreta es posible una interacción adecuada.
+interface Checkbox is
+    method paint()
+
+class WinCheckbox implements Checkbox is
+    method paint() is
+        // Representa una casilla en estilo Windows.
+
+class MacCheckbox implements Checkbox is
+    method paint() is
+        // Representa una casilla en estilo macOS.
+
+
+// El código cliente funciona con fábricas y productos
+// únicamente a través de tipos abstractos: GUIFactory, Button y
+// Checkbox. Esto te permite pasar cualquier subclase fábrica o
+// producto al código cliente sin descomponerlo.
+class Application is
+    private field factory: GUIFactory
+    private field button: Button
+    constructor Application(factory: GUIFactory) is
+        this.factory = factory
+    method createUI() is
+        this.button = factory.createButton()
+    method paint() is
+        button.paint()
+
+// La aplicación elige el tipo de fábrica dependiendo de la configuración
+// actual o de los ajustes del entorno y la crea durante el tiempo de 
+// ejecución (normalmente en la etapa de inicialización).
+class ApplicationConfigurator is
+    method main() is
+        config = readApplicationConfigFile()
+
+        if (config.OS == "Windows") then
+            factory = new WinFactory()
+        else if (config.OS == "Mac") then
+            factory = new MacFactory()
+        else
+            throw new Exception("Error! Unknown operating system.")
+
+        Application app = new Application(factory)
+
+    ````
+
+    

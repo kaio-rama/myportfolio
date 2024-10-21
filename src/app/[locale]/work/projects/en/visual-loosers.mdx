@@ -1,0 +1,39 @@
+---
+title: "Visual Loosers - Generador de visuales con GLSL y JavaScript"
+publishedAt: "2024-04-08"
+summary: "Generador de visuales simple realizado para utilizar en stages y streamings a traves de live coding."
+team:
+  - name: "Ramiro Canevari"
+    role: "Software Engineer"
+    avatar: "/images/avatar.jpg"
+    linkedIn: "https://www.linkedin.com/in/ramacanevari/"
+
+images:
+  - "/images/projects/project-01/visual Loosers.png"
+---
+
+## ¿Que es Visual Loosers?
+
+Es un generador de visuales a partir de código GLSL. Esto quiere decir que cuando entres en la página veras un editor de texto en donde podrás escribir código y este se renderizara cuando toques el botón "Ejecutar código". Este código sera ejecutado en el Canvas que forma el display del resto de la aplicación. ¿Simple no? Puedes empezar a ver resultados con el botón Random, el cual te "genera" códigos aleatorios (ya preestablecidos generados con IA) para que puedas empezar a familiarizarte con la interfaz de la aplicación.
+VisualLoosers está escrito en JavaScript e implementa WebGL a traves de p5.js.
+
+<iframe src='https://kaio-rama.github.io/visualsloosers/' height={600} ></iframe>
+<a href="https://kaio-rama.github.io/visualsloosers/" style={{ color:'#43a2a5ff', marginTop: 10 }}> Visual Loosers Preview en Github Pages</a>
+## Key Features
+
+- **Time**: Un valor flotante que representa el tiempo en segundos desde que comenzó la ejecución. Útil para animaciones.
+- **resolution**: Un vector de dos componentes (vec2) que representa el tamaño del canvas en píxeles. Se usa para normalizar coordenadas y adaptar el visual a la resolución de la pantalla.
+- **gl_FragCoord.xy**: Coordenadas del fragmento actual en el espacio de pantalla. Combinadas con resolution, permiten crear efectos basados en la posición.
+- **length**: Calcula la distancia desde el origen, útil para efectos radiales.
+
+## Documentación Visual Loosers
+
+Si bien se necesitan ciertos conocimientos de GLSL y programación en general para interactuar con la plataforma, se puede tambien a traves de los botones Random y una lectura rapida de la breve Documentación generar algunas visuales basicas para empezar a conocer la lógica de WebGL.
+La Documentación está disponible en <a style={{ color:'#43a2a5ff'}} href="https://portfolio2024-one-rust.vercel.app/blog/visual-loosers" target="_blank">Español</a> e <a style={{ color:'#43a2a5ff'}} target="_blank" href="https://portfolio2024-one-rust.vercel.app/blog/visual-loosers-en">Ingles</a> en el blog.
+
+## Technologies Used
+
+- **JavaScript**: Para la interactividad con el editor de texto.
+- **CSS**: Estilizar el editor de texto y la web.
+- **WebGL y p5.js**: Para la modificación de los shaders del canvas con GLSL.
+- **GitHub Pages**: Para hostear la página.

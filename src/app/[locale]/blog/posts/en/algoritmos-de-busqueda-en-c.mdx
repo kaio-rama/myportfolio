@@ -1,0 +1,139 @@
+---
+title: 'Algoritmos de busqueda en C'
+publishedAt: '2024-09-17'
+summary: 'Principios básicos, matematicos y fundamentales para comprender patrones algoritmicos en programación'
+---
+
+Cuando hablamos de la eficiencia de los algoritmos, simplemente desechamos las constantes. 
+Esto nos puede dejar tanto "O" (big O notacion), la cúal es omnipresente en programación y particularmente cuando se habla del diseño de algún algoritmo.
+Como también nos puede dejar con "Ω"(omega), la cúal representa el caso opuesto de O, es decir, si O la usamos para cuantificar cuanto es la mayor cantidad de pasos 
+para completar un algoritmo. Omega representa la minima cantidad de pasos que nos puede llevar completar el mismo algoritmo. 
+
+Tiempos de ejecución, de algoritmos, más comunes:
+
+### Big "O" Notation - Cota superior asintótica
+
+
+O(n**2) = cuadratic time.
+
+O(n log n) = n log n time.
+
+O(n) = linear time.
+
+O(log n) = logaritmic time.
+
+O(1) = constant time (constant number of steps).
+
+### Big Omega Notation - Límite inferior del tiempo de ejecución 
+
+Ω(n**2) 
+
+Ω(n log n) 
+
+Ω(n) 
+
+Ω(log n) 
+
+Ω(1) 
+
+Sin embargo pueden existir casos donde la mayor cantidad de pasos posibles para completar un algoritmo ("O") y la menor ("Ω") sean la misma,
+por ejemplo en un algoritmo donde queramos separ la cantidad de personas en un evento. En este caso siempre nos llevará la misma cantidad de pasos contabilizarlos a todos que sería n cantidad de veces.
+Para estos casos usamos el simbolo Θ (Theta).
+
+### Theta notation - Asymptotic Notation
+
+Θ(n**2) 
+
+Θ(n log n) 
+
+Θ(n)
+
+Θ(log n)
+
+Θ(log n)
+
+
+```` JavaScript
+
+n= number to cuantify. (ej: cantidad de x en a)
+n**2= number x on a of doing b things.
+
+
+````
+
+#### EJEMPLOS EN LOGARITMOS DE BÚSQUEDA:
+
+O(n) --> Linear Search ...
+
+O(log n) --> Binary Search ...
+
+Ω(1) --> linear search / Binary Search
+
+Θ(n) --> linear count 
+
+
+### Algoritmos de ordenamiento: 
+
+#### Selection Sort : Selecciona el elemento más pequeño ( o el más grande ) una y otra vez.
+ - Pros, usa poca memoria.
+ - Cons, tiene que repetir el proceso varias veces. 
+ (n-1 + n-2 + n-3 + ... + 1) 
+    || 
+ n(n-1)/2 
+    =
+ (n**2)/2 - n/2
+    =
+ O(n**2) && Ω(n**2) == Θ(n**2) 
+
+ - Pseudocódigo: 
+
+```` JavaScript
+for i from 0 to n-1
+    find smallest number between numbers[i] and numbers[n-1]
+    swap smalles number with numbers[i]
+
+````
+#### Buble Sort: Compara los adyacentes una y otra vez ordenandolos de mayor a menor (o menor a mayor).
+- Pros, puede abortarse si no hay nada que ordenar
+- Cons, tiene que repetir el proceso varias veces.
+ (n-1) x (n-1)
+ n**2 - 1n - 1n+1
+ n**2 - 2n + 1
+   =
+ O(n**2) && Ω(n)
+
+ - Pseudocódigo:
+
+ ```` JavaScript
+ Repeat n-1 times:
+   for i from 0 to n-2
+      if numbers[i] and numbers[i+1] out of order
+         swap them
+      if no swaps
+         quit   
+
+````
+
+#### Recursive algoritmic: El algoritmo utiliza un algoritmo dentro del mismo.
+Por ejemplo binary search, se declara a si misma y vuelve a utilizar el su algoritmo.
+
+#### Merge Sort: 
+- Pros, utiliza un algoritmo recursivo por lo que es notablemente más rapido.
+- Cons, utiliza más memoria (más de un array)
+
+n log2 n || n log n
+   =
+ O(n log n) && Ω(n log n) == Θ(log n)
+
+
+ - Pseudocódigo:
+
+ ```` JavaScript
+ if only one number
+   return
+ else
+   sort left half of numbers
+   sort right half of numbers
+   merge sorted halves 
+   
+````

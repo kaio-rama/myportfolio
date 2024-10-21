@@ -1,0 +1,305 @@
+---
+title: 'Uso conciente de la memoria con C'
+publishedAt: '2024-10-06'
+summary: 'Utilización de la memoria en C, asignacion dinamica de memoria, debug en C'
+---
+
+En C podemos acceder a la memoría donde se almacenan nuestras variables con los “pointers”, siendo los caracteres “&” y “*” quienes representan la dirección de memoria de una variable.
+
+Si quisiésemos crear un pointer para saber donde se almacena la variable n, por convención la llamaremos *p o *pointer (siempre usando primero la *, la cual no es la misma que mencionamos antes sino una convención como también lo es llamar en MAYÚSCULA a las CONSTANTES).
+
+Ejemplo: 
+
+```` C
+#include <stdio.h>
+int main(void)
+{
+    int n = 50;
+    int *p = &n;
+
+    printf(“%p \n”, p);
+}
+````
+
+* Uso de “*” → en la linea 5 la usamos para declarar un pointer (*p = &n, donde &n refiere a la memoria donde esta almacenada n) y en la linea 7 si pusiésemos (“%i \n”, *p) diríamos que acceda a la memoria que nos indica el pointer, p, y que nos traiga el int que se aloja en esa dirección.
+
+* Otra forma de declarar un pointer es, por ejemplo, “int* p” o “int * p”
+
+
+
+## <b>No existen las cadenas de texto o STRINGS en C </b>
+
+La forma de referirnos a un string en C, sin importar una librería que nos lo permita, es mediante un  tipo de datos denominado char* (char-star) y significa que la variable asignada no es un char sino la dirección de un carácter, por convención el primero de un string. 
+
+```` C
+int main (void)
+{
+	char *s = “Hello world!”;
+	printf(“%s\n”, s);
+}
+
+````
+
+## <b>POINTER ARITHMETIC</b>
+
+
+Adding an integer (positive or negative) to a pointer is valid in C. It assumes that the pointer points to an element in an array, and advances or retracts the pointer across as many array elements as the integer specifies. Here is an example, in which adding a positive integer advances the pointer to a later element in the same array. 
+```` C
+int main (void)
+{
+	char *s = “Hello world!”;
+	printf(“%c”, s);
+	printf(“%c”, (s +1));
+	printf(“%c\n”, (s +2));
+}
+
+result = Hel
+````
+
+## <b>MALLOC & FREE functions</b>
+
+La función malloc asigna un bloque de memoria de al menos size bytes. El bloque podría ser mayor que size bytes debido al espacio necesario para obtener información de alineación y de mantenimiento.
+La subrutina free desasigna un bloque de memoria asignado anteriormente por el subsistema malloc . Los resultados no definidos se producen si el parámetro Puntero no es una dirección asignada anteriormente por el subsistema malloc , o si el parámetro Puntero ya se ha desasignado. Si el parámetro Puntero es NULL, no se produce ninguna acción. 
+```` C
+#include <cs50.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main (void)
+{
+	char *s = get_string(“s: “);
+	if (s == NULL)
+	{
+		return 1;
+	}
+	char *t = malloc(strlen(s) + 1);
+	if (t == NULL)
+	{
+		return 1;
+	}
+	strcpy( t, s);
+	if (strlen(t) > 0)
+	{
+		t[0] = toupper(t[0]);
+	}
+	free(t);
+	return 0;
+}
+````
+
+- Siempre es una buena practica que malloc devuelva un NULL si no se puede asignar memoria. 
+- if(p == NULL) return 1;
+
+
+## <b>ASIGNAR POINTERS</b>
+
+Primero hay que declararlos (int *x;), luego asignarles un valor en la memoria con malloc 
+(x = malloc(sizeof(int)); ), y solo despues podemos asignar un valor a el pointer x (*x = x;)
+
+- memory assigment scopes:
+
+1) machine code (at the top)
+2) globals
+3) heap memory
+...
+…
+4) stack memory
+
+Teniendo en consideración los diferentes tipos de scopes, y sabiendo que cuando programamos sobre main estamos programando sobre la stack memory, es decir el nivel más bajo de “prioridad”, si quisiésemos intercambiar los valores de dos variables debemos asignar los valores a los pointers en lugar de a la variable en sí, es decir al lugar en la memoria que los almacena.
+
+```` C
+void swap(int *a, int *b)
+{
+    int temp = *a;
+    a* = b*;
+    b* = temp;
+}
+````
+
+
+## <b>EJEMPLO COMPLETO DE COMO FUNCIONA CP (copy command)</b>
+
+Descripción general
+Este programa copia el contenido de un archivo a otro, byte por byte. Aquí están los pasos detallados:
+        ◦ typedef uint8_t BYTE; define BYTE como un alias para uint8_t, que es un entero sin signo de 8 bits. Esto se usa para representar un byte.
+        ◦ Toma dos argumentos desde la línea de comandos (argv[1] y argv[2]), que son los nombres del archivo fuente y del archivo de destino respectivamente.
+        ◦ Abre el archivo fuente en modo binario de solo lectura (rb).
+        ◦ Abre el archivo de destino en modo binario de escritura (wb).
+        ◦ Lee el archivo fuente byte por byte usando fread y escribe cada byte en el archivo de destino con fwrite.
+        ◦ Cuando se termina de leer el archivo fuente, cierra ambos archivos para liberar los recursos.
+Este código es útil para copiar archivos binarios, ya que maneja los datos como bytes individuales, independientemente del contenido del archivo (texto, imágenes, etc.).
+
+```` C
+
+#include <stdio.h>   // Incluye la biblioteca estándar de entrada/salida.
+#include <stdint.h>  // Incluye tipos de datos de tamaño fijo, como uint8_t.
+
+// Define un nuevo tipo llamado BYTE que es equivalente a uint8_t (un entero de 8 bits sin signo).
+typedef uint8_t BYTE;
+
+int main(int argc, char *argv[])
+{
+    // Abre el archivo fuente en modo de lectura binaria ("rb").
+    FILE *src = fopen(argv[1], "rb");
+
+    // Abre el archivo de destino en modo de escritura binaria ("wb").
+    FILE *dst = fopen(argv[2], "wb");
+
+    // Declara una variable 'b' de tipo BYTE para almacenar los datos leídos.
+    BYTE b;
+
+    // Bucle que lee el archivo fuente byte a byte.
+    // fread(&b, sizeof(b), 1, src) intenta leer un byte de 'src' y almacenarlo en 'b'.
+    // Devuelve el número de elementos leídos (en este caso, 1 si se lee un byte, 0 si se llega al final del archivo).
+    while (fread(&b, sizeof(b), 1, src) != 0)
+    {
+        // Escribe el byte leído (almacenado en 'b') en el archivo de destino 'dst'.
+        fwrite(&b, sizeof(b), 1, dst);
+    }
+
+    // Cierra el archivo de destino para liberar recursos.
+    fclose(dst);
+
+    // Cierra el archivo fuente para liberar recursos.
+    fclose(src);
+}
+
+````
+## <b>ASIGNACIÓN DINÁMICA DE MEMORIA</b>
+
+En C, la asignación dinámica de memoria permite reservar memoria en tiempo de ejecución, en lugar de hacerlo en tiempo de compilación. Esto es útil cuando no se sabe de antemano cuánto espacio se necesitará, o cuando la cantidad de memoria requerida puede variar.
+Las funciones principales para la asignación dinámica de memoria en C son:
+    • malloc: Reserva un bloque de memoria del tamaño especificado en bytes y devuelve un puntero al comienzo de ese bloque. La memoria no está inicializada.
+    • calloc: Similar a malloc, pero además inicializa la memoria asignada a cero. También toma dos parámetros: el número de elementos y el tamaño de cada elemento.
+    • realloc: Cambia el tamaño de un bloque de memoria previamente asignado con malloc o calloc.
+    • free: Libera un bloque de memoria asignado dinámicamente, para que esa memoria pueda ser reutilizada por el sistema.
+
+## <b>NODES</b>
+
+Un nodo es una estructura, con una particularidad: al menos uno de los campos de la estructura es un puntero de una estructura de ese mismo tipo.
+Es decir, es un pointer que se le agrega a una variable para saber donde se encuentra la siguiente estructura. Ahorra tiempo en la asignación de memoria y en el uso de malloc.
+Un buen template para un nodo es:
+
+```` C
+typedef struct node
+{
+    int data;
+    struct node *next;
+} node;
+````
+
+A su vez siempre que inicialicemos un node, podemos asignarlo a un valor NULL hasta que sepamos a donde apuntar.
+
+- EJEMPLO: node *list = NULL;
+
+La convencion en C es utilizar the arrow operator (->) para acceder a los campos de una estructura. Esto reemplzaria el puntero (*) en C. 
+Por ejemplo, para acceder al campo data de una estructura nodo, se utiliza:
+
+- '(*n).data = valor;' o 'n->data = valor;'
+
+## <b> Bynary Search con nodes </b>
+
+Se podría definir una estructura para una busqueda binaria de la siguiente manera:
+
+```` C
+typedef struct node
+{
+    int data;
+    struct node *left;
+    struct node *right;
+} node;
+````
+
+## <b> Hash Tables </b>
+
+Una tabla de hash es una estructura que almacena claves y valores asociados. Cada clave se corresponde con un valor, y cada valor se corresponde con una clave. 
+Es decir, una tabla de hash es una tabla de asignación de claves a valores, donde cada clave se corresponde con un valor y cada valor se corresponde con una clave.
+Las tablas hash se suelen implementar sobre vectores de una dimensión, aunque se pueden hacer implementaciones multi-dimensionales basadas en varias claves. Como en el caso de los arrays,
+ las tablas hash proveen tiempo constante de búsqueda promedio O(1),3​ sin importar el número de elementos en la tabla. Sin embargo, en casos particularmente malos el tiempo de búsqueda puede llegar a O(n), es decir, en función del número de elementos.
+
+Comparada con otras estructuras de arrays asociadas, las tablas hash son más útiles cuando se almacenan grandes cantidades de información.
+
+Las tablas hash almacenan la información en posiciones pseudo-aleatorias, así que el acceso ordenado a su contenido es bastante lento. Otras estructuras como árboles binarios 
+auto-balanceables tienen un tiempo promedio de búsqueda mayor (tiempo de búsqueda O(log n)), pero la información está ordenada en todo momento. 
+
+La estructura de una tabla de hash es la siguiente:
+
+```` C
+typedef struct hash_table
+{
+    int size;
+    int capacity;
+    struct node **table;
+}
+````
+
+### <b>  Hash Functions </b>
+
+Un hash función es una función que asigna un valor a una clave. Es decir, dada una clave, devuelve un valor que puede ser utilizado para almacenarla en una tabla de hash.
+Los hash funciones son importantes porque permiten que las tablas de hash puedan almacenar claves de forma eficiente. 
+El hash función debe ser uniforme, es decir, debe asignar un valor uniforme a cada clave. Esto significa que la distribución de claves debe ser uniforme en el espacio de claves. 
+Una clave uniforme es una clave que se asigna a cada posición de la tabla de hash de manera uniforme. 
+
+### <b>  Hashing </b>
+
+Hashing es el proceso de convertir una clave en un valor. El valor resultante es una posición en la tabla de hash. 
+El proceso de hashing se realiza de manera iterativa, dividiendo la clave en partes menores y combinando cada parte con otra para obtener un valor. 
+Este proceso se repite varias veces para obtener una serie de valores. 
+
+### <b>  Hashing with Collisions </b>
+Cuando se produce un colision, se produce un conflicto entre dos valores. En este caso, se debe elegir un valor para reemplazar el otro. 
+
+Hay dos tipos de colisiones: 
+- Colisiones de valores: cuando dos valores tienen el mismo valor hash.
+- Colisiones de claves: cuando dos claves tienen el mismo valor hash.
+
+En el caso de colisiones de valores, se debe elegir un valor para reemplazar el otro. En el caso de colisiones de claves, se debe elegir una clave para reemplazar a la otra.
+
+### <b> Hash Tables with Chaining </b>
+
+Las tablas de hash con cadenas son una implementación de las tablas de hash que utiliza cadenas de nodos para almacenar los valores asociados a las claves. 
+Cada nodo en la cadena representa un valor asociado a una clave. Cada nodo en la cadena tiene un puntero a otro nodo que representa el siguiente valor asociado a la misma clave. 
+Esto permite que las tablas de hash con cadenas puedan almacenar un gran número de valores asociados a claves de forma eficiente. 
+Sin embargo, las tablas de hash con cadenas tienen un tiempo promedio de búsqueda más lento que las tablas de hash sin cadenas, ya que se necesita recorrer toda la cadena para encontrar un valor asociado a una clave.
+
+## Trie (Trie Tree)
+
+Un Trie (Trie Tree) es una estructura de datos que almacena una secuencia de caracteres como claves y valores asociados. 
+Es decir, un Trie es una estructura de datos que almacena una secuencia de caracteres como claves y valores asociados. 
+Es una estructura de datos basada en árboles, donde cada nodo en el árbol representa una clave y cada valor asociado a la clave es un nodo hijo.
+
+ El Trie es una estructura de datos que se utiliza en strings. Se puede utilizar para realizar búsquedas de manera óptima, 
+ con una complejidad casi lineal (dependiendo de la implementación y las restricciones del problema).
+
+La idea del Trie es armar un árbol, donde los nodos son las letras de las palabras. Las letras que están en rojo indican los nodos donde termina una palabra. Es decir, 
+si recorremos el arbol desde la raíz hasta ese nodo, formaremos una de las palabras iniciales. 
+Si lo recorremos en Preorden, podemos ordenar alfabéticamente a las palabras que forman el Trie. Los números escritos expresan el orden alfabético de las palabras.
+
+El tiempo de búsqueda en un Trie es O(n), donde n es la longitud de la palabra. Esto significa que si la longitud de la palabra es muy grande, el tiempo de búsqueda puede ser muy lento.
+
+
+## <b>LISTAS</b>
+
+Una lista es una estructura que contiene un puntero a la primera estructura de ese mismo tipo. 
+Es decir, es un pointer que apunta a la primera estructura de ese mismo tipo. Ahorra tiempo en la asignación de memoria y en el uso de malloc.
+
+```` C
+typedef struct list
+{
+    struct node *head;
+}   list;
+````   
+
+
+## <b>DEBUG IN C con Valgrind</b>
+
+Podemos, además de usar el debugger de VS Code, utilizar tanto los comandos debug50 como valgrind, ambas se utilizan en la terminal luego de “crear” el documento. 
+
+Ej: 	make example
+	valgrind ./example
+
+
+- Diferencias, valgrind no es para errores lógicas ni de sintaxis, sino para errores de memoria.
+
