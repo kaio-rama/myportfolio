@@ -86,6 +86,15 @@ export default function Blog({ params }: BlogParams) {
 	const { person } = renderContent(t);
 
 	return (
+		<pre style={{ 
+			whiteSpace: 'pre-wrap', 
+			wordWrap: 'break-word', 
+			maxWidth: '100%', 
+			overflowX: 'auto', 
+			padding: '1rem', 
+			backgroundColor: '#f0f0f0', 
+			borderRadius: '8px' 
+		  }}>
 		<Flex as="section"
 			fillWidth maxWidth="xs"
 			direction="column"
@@ -145,5 +154,6 @@ export default function Blog({ params }: BlogParams) {
 				<CustomMDX source={post.content} />
 			</Flex>
 		</Flex>
+	</pre>
 	)
 }

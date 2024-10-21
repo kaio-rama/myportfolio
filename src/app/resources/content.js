@@ -96,7 +96,7 @@ const about = {
                         height: 9
                     },
                     {
-                        src: '/images/projects/project-01/londo-logo.png',
+                        src: '/images/projects/project-01/londo logo big.png',
                         alt: 'Once UI Project',
                         width: 16,
                         height: 9
