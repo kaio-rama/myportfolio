@@ -92,7 +92,6 @@ export default function Blog({ params }: BlogParams) {
 			maxWidth: '100%', 
 			overflowX: 'auto', 
 			padding: '1rem', 
-			backgroundColor: '#f0f0f0', 
 			borderRadius: '8px' 
 		  }}>
 		<Flex as="section"
