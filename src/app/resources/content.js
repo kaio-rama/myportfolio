@@ -33,9 +33,9 @@ const social = [
         link: 'https://www.linkedin.com/in/ramacanevari',
     },
     {
-        name: 'X',
-        icon: 'x',
-        link: '',
+        name: 'Curriculum Vitae',
+        icon: 'pdf',
+        link: 'https://drive.google.com/file/d/1sKpxZMX75ZgK6r42fYRX5Qa9_Sb9aYEr/view',
     },
     {
         name: 'Email',
