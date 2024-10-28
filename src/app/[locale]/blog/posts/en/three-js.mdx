@@ -1,0 +1,112 @@
+---
+title: 'Consejos útiles para volver a Three.js en 2024'
+publishedAt: '2024-10-28'
+summary: 'Recopilación de información, librerías y recursos útiles para el desarrollo de proyectos con Three.js'
+---
+
+Este fin de semana he vuelto a trabajar con Three.js, un motor de renderizado de gráficos 
+en 3D para el navegador. Teniendo fuertes bases en 3D y programación, realmente redescubrí 
+la pasión por este motor.
+
+En este artículo, comparto algunos consejos que he aprendido a lo largo de mi experiencia
+ con Three.js.
+
+### Texturas
+Para importar texturas se usa la función `useLoader` y el método de la clase 
+`THREE.TextureLoader`.
+
+```javascript
+const textura = useLoader(THREE.TextureLoader, '/[folder]/archivo.png');
+
+Luego, añadiremos esta textura al material como parámetro de su método map o matcap 
+(según sea un matcap o no).
+ Para usar un matcap correctamente, debemos emplear el material meshMatcapMaterial.
+
+javascript
+
+<meshMatcapMaterial matcap={textura} />
+// o
+<meshStandardMaterial map={textura} />
+
+Si tenemos problemas de resolución, podemos intentar solucionarlo con:
+
+javascript
+
+textura.minFilter = THREE.NearestFilter;
+textura.magFilter = THREE.NearestFilter;
+
+O bien, modificando los parámetros de ajuste ("wrapping") de la textura. Aquí un ejemplo
+ para crear un efecto "loco":
+
+javascript
+
+textura.wrapS = textura.wrapT = THREE.RepeatWrapping;
+textura.repeat.set(10, 10);
+
+Importando modelos al proyecto con GLTF
+
+Descargue el modelo en formato GLTF y descomprima el archivo en la raíz del proyecto. 
+Para obtener el formato necesario para importar el modelo a la escena, instale el 
+paquete complementario gltf-pipeline:
+
+bash
+
+npm i -D gltf-pipeline
+
+Luego, convierta el modelo del formato GLTF al formato GLB, ya que en este
+ formato todos los datos del modelo se colocan en un solo archivo. Definimos
+  la carpeta pública como el directorio de salida: formato
+
+bash
+
+gltf-pipeline -i scene.gltf -o public/[example].glb
+
+Luego necesitamos generar un componente de React que contendrá el marcado de este modelo 
+para agregarlo a la escena. Utilicemos el recurso oficial de los desarrolladores de
+ @react-three/fiber. Busque el archivo en el convertidor, descargue el código generado y 
+ transfiéralo a su proyecto en un nuevo archivo WeaponModel.jsx.
+
+También se puede usar gltfjsx instalándolo en la carpeta donde está el 
+asset con el siguiente comando:
+
+bash
+
+npx gltfjsx [nombreDelArchivo.gltf]
+
+Esto creará automáticamente un archivo JSX en la ubicación del asset con
+ el nombre [nombreDelArchivo.js].
+Importar HDRIs a la escena
+
+Descargue un HDRI (de Polyhaven, etc.), conviértalo a CubeMap (puede usar
+ HDRI to CubeMap) y descargue las imágenes resultantes. 
+ Importe las imágenes a la carpeta /public/[example]. 
+ Para usarlas, cree una constante con useCubeTexture:
+
+javascript
+
+const cubeMap = useCubeTexture(["px.png", "nx.png", "py.png", "ny.png", "pz.png",
+ "nz.png"], { path: "cubeMap/" });
+
+Aplique el CubeMap a un material básico como envMap, o también puede aplicarlo
+ como un componente aparte Environment:
+
+javascript
+
+import { Environment } from '@react-three/drei';
+
+return (
+  <mesh position={[-4, 4, 0]}> 
+    <torusKnotGeometry args={[1, 0.3, 100, 100]} />
+    <meshStandardMaterial metalness={1} roughness={0} />
+    <Environment files='/darknight.hdr' />
+  </mesh>
+);
+
+Cuando se utiliza el módulo Environment, ya no es necesario incluir una luz en la
+ escena si está utilizando materiales PBR, como MeshStandardMaterial y
+  MeshPhysicalMaterial.
+
+Recursos avanzados
+
+Creating a Spherical Environment Mapping shader
+https://www.clicktorelease.com/blog/creating-spherical-environment-mapping-shader/
